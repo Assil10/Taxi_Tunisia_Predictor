@@ -25,6 +25,7 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [autoDetectCity, setAutoDetectCity] = useState(true); // Toggle for auto-detect city
+  const [routeGeometry, setRouteGeometry] = useState(null); // Route geometry for map visualization
 
   const handlePredict = async () => {
     // Validate inputs
@@ -36,6 +37,7 @@ const Home = () => {
     setError(null);
     setIsLoading(true);
     setPrediction(null);
+    setRouteGeometry(null); // Clear previous route while loading
 
     try {
       // Send city only if auto-detect is OFF, otherwise let backend detect
@@ -49,6 +51,13 @@ const Home = () => {
       // Update city state with detected city from backend (if auto-detect was ON)
       if (autoDetectCity && result.city) {
         setCity(result.city);
+      }
+
+      // Update route geometry for map visualization
+      if (result.route_geometry) {
+        setRouteGeometry(result.route_geometry);
+      } else {
+        setRouteGeometry(null);
       }
 
       setPrediction(result);
@@ -65,6 +74,18 @@ const Home = () => {
     setEndPoint(null);
     setPrediction(null);
     setError(null);
+    setRouteGeometry(null);
+  };
+
+  // Clear route geometry when points change
+  const handleStartPointChange = (point) => {
+    setStartPoint(point);
+    setRouteGeometry(null); // Clear route when start point changes
+  };
+
+  const handleEndPointChange = (point) => {
+    setEndPoint(point);
+    setRouteGeometry(null); // Clear route when end point changes
   };
 
   return (
@@ -89,8 +110,9 @@ const Home = () => {
                 <MapSelector
                   startPoint={startPoint}
                   endPoint={endPoint}
-                  onStartPointChange={setStartPoint}
-                  onEndPointChange={setEndPoint}
+                  onStartPointChange={handleStartPointChange}
+                  onEndPointChange={handleEndPointChange}
+                  routeGeometry={routeGeometry}
                 />
               </div>
             </div>

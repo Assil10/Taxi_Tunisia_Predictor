@@ -28,7 +28,7 @@ function MapClickHandler({ onMapClick, hasStart, hasEnd }) {
   return null;
 }
 
-const MapSelector = ({ startPoint, endPoint, onStartPointChange, onEndPointChange }) => {
+const MapSelector = ({ startPoint, endPoint, onStartPointChange, onEndPointChange, routeGeometry }) => {
   const mapRef = useRef(null);
 
   const handleMapClick = (latlng, hasStart, hasEnd) => {
@@ -47,10 +47,12 @@ const MapSelector = ({ startPoint, endPoint, onStartPointChange, onEndPointChang
     }
   };
 
-  // Create polyline if both points exist
-  const polylinePositions = startPoint && endPoint
-    ? [[startPoint.lat, startPoint.lng], [endPoint.lat, endPoint.lng]]
-    : [];
+  // Use route geometry if available (actual streets), otherwise use straight line
+  const polylinePositions = routeGeometry 
+    ? routeGeometry  // Use actual route geometry from OSRM
+    : (startPoint && endPoint 
+      ? [[startPoint.lat, startPoint.lng], [endPoint.lat, endPoint.lng]]  // Fallback to straight line
+      : []);
 
   return (
     <div className="w-full h-full rounded-lg overflow-hidden shadow-lg border-2 border-gray-300">
@@ -100,14 +102,14 @@ const MapSelector = ({ startPoint, endPoint, onStartPointChange, onEndPointChang
           </Marker>
         )}
         
-        {/* Route polyline */}
+        {/* Route polyline - shows actual street route if available, otherwise straight line */}
         {polylinePositions.length > 0 && (
           <Polyline
             positions={polylinePositions}
-            color="blue"
-            weight={4}
-            opacity={0.7}
-            dashArray="10, 10"
+            color={routeGeometry ? "#3b82f6" : "#60a5fa"} // Different color for actual route vs straight line
+            weight={routeGeometry ? 5 : 4}
+            opacity={routeGeometry ? 0.8 : 0.7}
+            dashArray={routeGeometry ? undefined : "10, 10"} // Solid line for actual route, dashed for straight line
           />
         )}
       </MapContainer>

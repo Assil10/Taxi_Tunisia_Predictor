@@ -55,7 +55,7 @@ router.post('/predict', async (req, res) => {
       console.log(`✅ Detected city: ${detectedCity}`);
     }
     
-    // Step 2: Get distance and duration from OSRM
+    // Step 2: Get distance, duration, and route geometry from OSRM
     console.log(`📍 Getting route info from ${start.lat},${start.lng} to ${end.lat},${end.lng}`);
     const routeInfo = await getRouteInfo(
       start.lat,
@@ -64,7 +64,7 @@ router.post('/predict', async (req, res) => {
       end.lng
     );
     
-    const { distance_km, duration_min } = routeInfo;
+    const { distance_km, duration_min, geometry } = routeInfo;
     
     // Step 3: Get fare prediction from ML model
     console.log(`🤖 Predicting fare: ${distance_km}km, ${duration_min}min, ${detectedCity}, ${time_of_day}`);
@@ -105,7 +105,8 @@ router.post('/predict', async (req, res) => {
       end: {
         lat: end.lat,
         lng: end.lng
-      }
+      },
+      route_geometry: geometry || null // Route geometry for map visualization
     });
     
   } catch (error) {
