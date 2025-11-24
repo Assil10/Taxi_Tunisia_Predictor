@@ -3,7 +3,13 @@ import MapSelector from '../components/MapSelector';
 import PredictionCard from '../components/PredictionCard';
 import { predictFare } from '../services/api';
 
-const CITIES = ['Tunis', 'Sousse', 'Sfax', 'Bizerte', 'Gabes', 'Kairouan', 'Gafsa'];
+// All 24 Tunisian governorates
+const CITIES = [
+  'Tunis', 'Ariana', 'Ben Arous', 'Manouba', 'Nabeul', 'Zaghouan',
+  'Bizerte', 'Béja', 'Jendouba', 'Kef', 'Siliana', 'Kairouan',
+  'Kasserine', 'Sidi Bouzid', 'Sousse', 'Monastir', 'Mahdia',
+  'Sfax', 'Gabes', 'Medenine', 'Tataouine', 'Gafsa', 'Tozeur', 'Kebili'
+];
 const TIME_OPTIONS = [
   { value: 'morning', label: '🌅 Morning' },
   { value: 'afternoon', label: '☀️ Afternoon' },
@@ -18,6 +24,7 @@ const Home = () => {
   const [prediction, setPrediction] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [autoDetectCity, setAutoDetectCity] = useState(true); // Toggle for auto-detect city
 
   const handlePredict = async () => {
     // Validate inputs
@@ -26,22 +33,23 @@ const Home = () => {
       return;
     }
 
-    if (!city) {
-      setError('Please select a city');
-      return;
-    }
-
     setError(null);
     setIsLoading(true);
     setPrediction(null);
 
     try {
+      // Send city only if auto-detect is OFF, otherwise let backend detect
       const result = await predictFare({
         start: startPoint,
         end: endPoint,
-        city,
+        city: autoDetectCity ? undefined : city, // Auto-detect if toggle is ON
         time_of_day: timeOfDay
       });
+      
+      // Update city state with detected city from backend (if auto-detect was ON)
+      if (autoDetectCity && result.city) {
+        setCity(result.city);
+      }
 
       setPrediction(result);
     } catch (err) {
@@ -94,23 +102,54 @@ const Home = () => {
               </h2>
               
               <div className="space-y-4">
-                {/* City Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    City
-                  </label>
-                  <select
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                {/* Auto-Detect City Toggle */}
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex items-center space-x-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Auto-detect City
+                      </label>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Automatically detect city from map coordinates
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setAutoDetectCity(!autoDetectCity)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
+                      autoDetectCity ? 'bg-primary-600' : 'bg-gray-300'
+                    }`}
+                    role="switch"
+                    aria-checked={autoDetectCity}
                   >
-                    {CITIES.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        autoDetectCity ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
                 </div>
+
+                {/* City Selection - Only show when auto-detect is OFF */}
+                {!autoDetectCity && (
+                  <div className="animate-fadeIn">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      City
+                    </label>
+                    <select
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    >
+                      {CITIES.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 {/* Time of Day Selection */}
                 <div>

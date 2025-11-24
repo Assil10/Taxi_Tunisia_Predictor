@@ -10,6 +10,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, r2_score
 import pickle
 import os
+import sys
+
+# Fix Windows console encoding for emojis
+if sys.platform == 'win32':
+    import codecs
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
 
 def generate_synthetic_data(n_samples=2000):
     """
@@ -23,7 +30,13 @@ def generate_synthetic_data(n_samples=2000):
     """
     np.random.seed(42)
     
-    cities = ['Tunis', 'Sousse', 'Sfax', 'Bizerte', 'Gabes', 'Kairouan', 'Gafsa']
+    # All 24 Tunisian governorates
+    cities = [
+        'Tunis', 'Ariana', 'Ben Arous', 'Manouba', 'Nabeul', 'Zaghouan',
+        'Bizerte', 'Béja', 'Jendouba', 'Kef', 'Siliana', 'Kairouan',
+        'Kasserine', 'Sidi Bouzid', 'Sousse', 'Monastir', 'Mahdia',
+        'Sfax', 'Gabes', 'Medenine', 'Tataouine', 'Gafsa', 'Tozeur', 'Kebili'
+    ]
     time_of_day_options = ['morning', 'afternoon', 'night']
     
     data = []
@@ -43,15 +56,35 @@ def generate_synthetic_data(n_samples=2000):
         # Calculate base fare
         base_fare = np.random.uniform(1.0, 2.0)
         
-        # Price per km varies by city
+        # Price per km varies by city (capital and major cities are more expensive)
         city_multipliers = {
+            # Capital and major cities (100% - 95%)
             'Tunis': 1.0,
             'Sousse': 0.95,
             'Sfax': 0.95,
+            'Ariana': 0.95,
+            'Ben Arous': 0.95,
+            'Manouba': 0.95,
+            'Nabeul': 0.95,
+            # Medium cities (90% - 85%)
             'Bizerte': 0.90,
+            'Monastir': 0.90,
+            'Mahdia': 0.90,
             'Gabes': 0.90,
             'Kairouan': 0.90,
-            'Gafsa': 0.90
+            'Gafsa': 0.90,
+            'Medenine': 0.90,
+            'Zaghouan': 0.88,
+            'Béja': 0.88,
+            'Jendouba': 0.88,
+            'Kef': 0.88,
+            'Siliana': 0.88,
+            # Smaller cities (85% - 80%)
+            'Kasserine': 0.85,
+            'Sidi Bouzid': 0.85,
+            'Tozeur': 0.85,
+            'Tataouine': 0.85,
+            'Kebili': 0.80
         }
         price_per_km = np.random.uniform(0.7, 1.2) * city_multipliers[city]
         
@@ -82,8 +115,13 @@ def encode_features(df):
     """Encode categorical features for ML model"""
     df_encoded = df.copy()
     
-    # One-hot encode city
-    cities = ['Tunis', 'Sousse', 'Sfax', 'Bizerte', 'Gabes', 'Kairouan', 'Gafsa']
+    # One-hot encode city (all 24 governorates)
+    cities = [
+        'Tunis', 'Ariana', 'Ben Arous', 'Manouba', 'Nabeul', 'Zaghouan',
+        'Bizerte', 'Béja', 'Jendouba', 'Kef', 'Siliana', 'Kairouan',
+        'Kasserine', 'Sidi Bouzid', 'Sousse', 'Monastir', 'Mahdia',
+        'Sfax', 'Gabes', 'Medenine', 'Tataouine', 'Gafsa', 'Tozeur', 'Kebili'
+    ]
     for city in cities:
         df_encoded[f'city_{city}'] = (df_encoded['city'] == city).astype(int)
     
@@ -151,7 +189,12 @@ def train_model():
     # Save feature columns for prediction
     feature_info = {
         'feature_columns': feature_cols,
-        'cities': ['Tunis', 'Sousse', 'Sfax', 'Bizerte', 'Gabes', 'Kairouan', 'Gafsa'],
+        'cities': [
+            'Tunis', 'Ariana', 'Ben Arous', 'Manouba', 'Nabeul', 'Zaghouan',
+            'Bizerte', 'Béja', 'Jendouba', 'Kef', 'Siliana', 'Kairouan',
+            'Kasserine', 'Sidi Bouzid', 'Sousse', 'Monastir', 'Mahdia',
+            'Sfax', 'Gabes', 'Medenine', 'Tataouine', 'Gafsa', 'Tozeur', 'Kebili'
+        ],
         'time_options': ['morning', 'afternoon', 'night']
     }
     

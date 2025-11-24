@@ -23,15 +23,19 @@ export const predictFare = async (distance_km, duration_min, city, time_of_day) 
   return new Promise((resolve, reject) => {
     // Path to Python predict script
     const pythonScriptPath = join(__dirname, '../../ml/predict.py');
+    // Path to ml directory (working directory for Python script)
+    const mlDirectory = join(__dirname, '../../ml');
     
-    // Spawn Python process
+    // Spawn Python process with working directory set to ml folder
     const pythonProcess = spawn('python', [
       pythonScriptPath,
       distance_km.toString(),
       duration_min.toString(),
       city,
       time_of_day
-    ]);
+    ], {
+      cwd: mlDirectory  // Set working directory to ml folder so it can find model.pkl
+    });
     
     let stdout = '';
     let stderr = '';

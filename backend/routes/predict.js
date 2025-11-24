@@ -6,6 +6,7 @@
 import express from 'express';
 import { getRouteInfo } from '../services/osrm.js';
 import { predictFare } from '../services/pythonPredict.js';
+import { detectCityFromCoordinates } from '../services/geocoding.js';
 import TaxiPrediction from '../models/TaxiPrediction.js';
 
 const router = express.Router();
@@ -27,9 +28,9 @@ router.post('/predict', async (req, res) => {
     const { start, end, time_of_day, city } = req.body;
     
     // Validate input
-    if (!start || !end || !time_of_day || !city) {
+    if (!start || !end || !time_of_day) {
       return res.status(400).json({
-        error: 'Missing required fields: start, end, time_of_day, city'
+        error: 'Missing required fields: start, end, time_of_day'
       });
     }
     
@@ -46,7 +47,15 @@ router.post('/predict', async (req, res) => {
       });
     }
     
-    // Step 1: Get distance and duration from OSRM
+    // Step 1: Auto-detect city from start coordinates if not provided
+    let detectedCity = city;
+    if (!detectedCity) {
+      console.log(`🌍 Auto-detecting city from coordinates: ${start.lat},${start.lng}`);
+      detectedCity = await detectCityFromCoordinates(start.lat, start.lng);
+      console.log(`✅ Detected city: ${detectedCity}`);
+    }
+    
+    // Step 2: Get distance and duration from OSRM
     console.log(`📍 Getting route info from ${start.lat},${start.lng} to ${end.lat},${end.lng}`);
     const routeInfo = await getRouteInfo(
       start.lat,
@@ -57,16 +66,16 @@ router.post('/predict', async (req, res) => {
     
     const { distance_km, duration_min } = routeInfo;
     
-    // Step 2: Get fare prediction from ML model
-    console.log(`🤖 Predicting fare: ${distance_km}km, ${duration_min}min, ${city}, ${time_of_day}`);
+    // Step 3: Get fare prediction from ML model
+    console.log(`🤖 Predicting fare: ${distance_km}km, ${duration_min}min, ${detectedCity}, ${time_of_day}`);
     const predicted_price = await predictFare(
       distance_km,
       duration_min,
-      city,
+      detectedCity,
       time_of_day
     );
     
-    // Step 3: Save prediction to database
+    // Step 4: Save prediction to database
     const prediction = new TaxiPrediction({
       start_lat: start.lat,
       start_lng: start.lng,
@@ -75,19 +84,19 @@ router.post('/predict', async (req, res) => {
       distance_km,
       duration_min,
       predicted_price,
-      city,
+      city: detectedCity,
       time_of_day,
       datetime: new Date()
     });
     
     await prediction.save();
     
-    // Step 4: Return result
+    // Step 5: Return result
     res.json({
       distance_km,
       duration_min,
       predicted_price,
-      city,
+      city: detectedCity,
       time_of_day,
       start: {
         lat: start.lat,
