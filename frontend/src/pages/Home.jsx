@@ -1,5 +1,6 @@
 import React, { useState, lazy, Suspense, useCallback, useMemo } from 'react';
 import PredictionCard from '../components/PredictionCard';
+import PlaceSearch from '../components/PlaceSearch';
 import { predictFare } from '../services/api';
 
 // Lazy load MapSelector for better performance
@@ -28,6 +29,7 @@ const Home = () => {
   const [error, setError] = useState(null);
   const [autoDetectCity, setAutoDetectCity] = useState(true); // Toggle for auto-detect city
   const [routeGeometry, setRouteGeometry] = useState(null); // Route geometry for map visualization
+  const [searchCenter, setSearchCenter] = useState(null); // Center map on searched location
 
   const handlePredict = useCallback(async () => {
     // Validate inputs
@@ -90,6 +92,19 @@ const Home = () => {
     setRouteGeometry(null); // Clear route when end point changes
   }, []);
 
+  // Handle place selection from search
+  const handleStartPlaceSelect = useCallback((place) => {
+    setStartPoint({ lat: place.lat, lng: place.lng });
+    setSearchCenter({ lat: place.lat, lng: place.lng });
+    setRouteGeometry(null);
+  }, []);
+
+  const handleEndPlaceSelect = useCallback((place) => {
+    setEndPoint({ lat: place.lat, lng: place.lng });
+    setSearchCenter({ lat: place.lat, lng: place.lng });
+    setRouteGeometry(null);
+  }, []);
+
   return (
     <div className="container mx-auto px-4 py-8 sm:py-12">
       <div className="max-w-7xl mx-auto">
@@ -125,6 +140,19 @@ const Home = () => {
                   </div>
                 )}
               </div>
+
+              {/* Place Search Bars */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                <PlaceSearch
+                  onPlaceSelect={handleStartPlaceSelect}
+                  placeholder="Search start location..."
+                />
+                <PlaceSearch
+                  onPlaceSelect={handleEndPlaceSelect}
+                  placeholder="Search destination..."
+                />
+              </div>
+
               <div className="h-96 sm:h-[500px] relative rounded-xl overflow-hidden">
                 <Suspense fallback={
                   <div className="w-full h-full flex items-center justify-center bg-slate-900/50">
@@ -140,6 +168,7 @@ const Home = () => {
                     onStartPointChange={handleStartPointChange}
                     onEndPointChange={handleEndPointChange}
                     routeGeometry={routeGeometry}
+                    searchCenter={searchCenter}
                   />
                 </Suspense>
               </div>

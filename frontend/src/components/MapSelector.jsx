@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, memo, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -28,7 +28,23 @@ function MapClickHandler({ onMapClick, hasStart, hasEnd }) {
   return null;
 }
 
-const MapSelector = memo(({ startPoint, endPoint, onStartPointChange, onEndPointChange, routeGeometry }) => {
+// Component to handle map panning/zooming
+function MapController({ center, zoom }) {
+  const map = useMap();
+  
+  useEffect(() => {
+    if (center) {
+      map.setView(center, zoom || map.getZoom(), {
+        animate: true,
+        duration: 0.5
+      });
+    }
+  }, [center, zoom, map]);
+  
+  return null;
+}
+
+const MapSelector = memo(({ startPoint, endPoint, onStartPointChange, onEndPointChange, routeGeometry, searchCenter }) => {
   const mapRef = useRef(null);
 
   const handleMapClick = useCallback((latlng, hasStart, hasEnd) => {
@@ -66,6 +82,9 @@ const MapSelector = memo(({ startPoint, endPoint, onStartPointChange, onEndPoint
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        
+        {/* Map controller for programmatic panning */}
+        {searchCenter && <MapController center={[searchCenter.lat, searchCenter.lng]} zoom={15} />}
         
         {/* Map click handlers */}
         <MapClickHandler 
@@ -130,8 +149,8 @@ const MapSelector = memo(({ startPoint, endPoint, onStartPointChange, onEndPoint
         </p>
       </div>
 
-      {/* Status indicators */}
-      {startPoint && (
+      {/* Status indicators - switch based on state */}
+      {startPoint && !endPoint && (
         <div className="absolute top-4 right-4 glass-card-strong px-4 py-2 rounded-xl shadow-xl z-[1000] border border-green-500/30 animate-fadeIn">
           <div className="flex items-center gap-2 text-sm">
             <span className="w-2 h-2 bg-green-400 rounded-full pulse-dot"></span>
@@ -140,10 +159,10 @@ const MapSelector = memo(({ startPoint, endPoint, onStartPointChange, onEndPoint
         </div>
       )}
       
-      {endPoint && (
-        <div className="absolute top-4 right-4 glass-card-strong px-4 py-2 rounded-xl shadow-xl z-[1000] border border-red-500/30 animate-fadeIn">
+      {startPoint && endPoint && (
+        <div className="absolute top-4 right-4 glass-card-strong px-4 py-2 rounded-xl shadow-xl z-[1000] border border-blue-500/30 animate-fadeIn">
           <div className="flex items-center gap-2 text-sm">
-            <span className="w-2 h-2 bg-red-400 rounded-full pulse-dot"></span>
+            <span className="w-2 h-2 bg-blue-400 rounded-full pulse-dot"></span>
             <span className="text-slate-200 font-medium">Route ready</span>
           </div>
         </div>
