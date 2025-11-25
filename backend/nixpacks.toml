@@ -1,0 +1,15 @@
+# Railway Nixpacks Configuration
+# Ensures Python is available for ML scripts
+
+[phases.setup]
+nixPkgs = ["nodejs-18_x", "python39", "python39Packages.pip"]
+
+[phases.install]
+cmds = [
+  "npm install",
+  "pip3 install -r ../ml/requirements.txt"
+]
+
+[start]
+cmd = "npm start"
+

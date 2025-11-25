@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 
-const PredictionCard = ({ prediction, isLoading }) => {
+const PredictionCard = memo(({ prediction, isLoading }) => {
   const [animatedPrice, setAnimatedPrice] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -136,7 +136,9 @@ const PredictionCard = ({ prediction, isLoading }) => {
       </div>
     </div>
   );
-};
+});
+
+PredictionCard.displayName = 'PredictionCard';
 
 export default PredictionCard;
 

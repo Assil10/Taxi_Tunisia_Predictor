@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+/* Font loading optimized - moved to HTML for better performance */
 
 @tailwind base;
 @tailwind components;
@@ -19,6 +19,9 @@ body {
   background: #0a0e27;
   color: #e2e8f0;
   overflow-x: hidden;
+  /* Performance optimizations */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 #root {
@@ -44,33 +47,34 @@ body {
   background: linear-gradient(180deg, #2563eb, #7c3aed);
 }
 
-/* Glass morphism effect */
+/* Glass morphism effect - Optimized for performance */
 .glass-card {
-  background: rgba(15, 23, 42, 0.7);
+  background: rgba(15, 23, 42, 0.8);
   border: 1px solid rgba(148, 163, 184, 0.15);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 
               0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(8px) saturate(150%);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+  will-change: transform;
 }
 
 .glass-card-strong {
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(15, 23, 42, 0.9);
   border: 1px solid rgba(148, 163, 184, 0.25);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4),
               0 0 0 1px rgba(255, 255, 255, 0.08) inset;
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  will-change: transform;
 }
 
-/* Gradient borders */
+/* Gradient borders - Static for better performance */
 .gradient-border {
   position: relative;
   border-radius: 1rem;
   background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
   padding: 2px;
-  background-size: 200% 200%;
-  animation: gradientShift 3s ease infinite;
+  /* Removed infinite animation for better performance */
 }
 
 .gradient-border > div {
@@ -78,21 +82,14 @@ body {
   background: rgba(15, 23, 42, 0.95);
 }
 
-@keyframes gradientShift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
+/* Removed gradientShift animation for better performance */
 
 /* Chip/Badge styles */
 .chip {
   @apply inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(139, 92, 246, 0.25));
   border: 1px solid rgba(148, 163, 184, 0.2);
-  backdrop-filter: blur(10px);
+  /* Removed backdrop-filter for better performance */
 }
 
 /* Leaflet map container styles */
@@ -187,7 +184,7 @@ body {
   animation: scaleIn 0.4s ease-out;
 }
 
-/* Pulse dot animation */
+/* Pulse dot animation - optimized */
 .pulse-dot {
   position: relative;
 }
@@ -199,6 +196,7 @@ body {
   border-radius: 9999px;
   border: 2px solid rgba(59, 130, 246, 0.6);
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  will-change: transform, opacity;
 }
 
 @keyframes pulse {
@@ -256,7 +254,7 @@ body {
   box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
 }
 
-/* Shimmer loading effect */
+/* Shimmer loading effect - optimized */
 .shimmer {
   background: linear-gradient(
     90deg,
@@ -266,5 +264,6 @@ body {
   );
   background-size: 1000px 100%;
   animation: shimmer 2s infinite;
+  will-change: background-position;
 }
 

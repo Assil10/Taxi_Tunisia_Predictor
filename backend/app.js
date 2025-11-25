@@ -16,7 +16,13 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || process.env.NODE_ENV === 'production' 
+    ? ['https://your-frontend.vercel.app', 'https://your-frontend.netlify.app'] // Add your actual frontend URLs
+    : ['http://localhost:3000', 'http://localhost:5173'],
+  credentials: true
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Health check endpoint

@@ -27,7 +27,9 @@ export const predictFare = async (distance_km, duration_min, city, time_of_day) 
     const mlDirectory = join(__dirname, '../../ml');
     
     // Spawn Python process with working directory set to ml folder
-    const pythonProcess = spawn('python', [
+    // Try python3 first, fallback to python for Windows compatibility
+    const pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
+    const pythonProcess = spawn(pythonCmd, [
       pythonScriptPath,
       distance_km.toString(),
       duration_min.toString(),

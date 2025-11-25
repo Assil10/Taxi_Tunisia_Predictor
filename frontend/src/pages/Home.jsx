@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import MapSelector from '../components/MapSelector';
+import React, { useState, lazy, Suspense, useCallback, useMemo } from 'react';
 import PredictionCard from '../components/PredictionCard';
 import { predictFare } from '../services/api';
+
+// Lazy load MapSelector for better performance
+const MapSelector = lazy(() => import('../components/MapSelector'));
 
 // All 24 Tunisian governorates
 const CITIES = [
@@ -27,7 +29,7 @@ const Home = () => {
   const [autoDetectCity, setAutoDetectCity] = useState(true); // Toggle for auto-detect city
   const [routeGeometry, setRouteGeometry] = useState(null); // Route geometry for map visualization
 
-  const handlePredict = async () => {
+  const handlePredict = useCallback(async () => {
     // Validate inputs
     if (!startPoint || !endPoint) {
       setError('Please select both start and end points on the map');
@@ -67,26 +69,26 @@ const Home = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [startPoint, endPoint, autoDetectCity, city, timeOfDay]);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setStartPoint(null);
     setEndPoint(null);
     setPrediction(null);
     setError(null);
     setRouteGeometry(null);
-  };
+  }, []);
 
   // Clear route geometry when points change
-  const handleStartPointChange = (point) => {
+  const handleStartPointChange = useCallback((point) => {
     setStartPoint(point);
     setRouteGeometry(null); // Clear route when start point changes
-  };
+  }, []);
 
-  const handleEndPointChange = (point) => {
+  const handleEndPointChange = useCallback((point) => {
     setEndPoint(point);
     setRouteGeometry(null); // Clear route when end point changes
-  };
+  }, []);
 
   return (
     <div className="container mx-auto px-4 py-8 sm:py-12">
@@ -124,13 +126,22 @@ const Home = () => {
                 )}
               </div>
               <div className="h-96 sm:h-[500px] relative rounded-xl overflow-hidden">
-                <MapSelector
-                  startPoint={startPoint}
-                  endPoint={endPoint}
-                  onStartPointChange={handleStartPointChange}
-                  onEndPointChange={handleEndPointChange}
-                  routeGeometry={routeGeometry}
-                />
+                <Suspense fallback={
+                  <div className="w-full h-full flex items-center justify-center bg-slate-900/50">
+                    <div className="text-center">
+                      <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-2"></div>
+                      <p className="text-sm text-slate-400">Loading map...</p>
+                    </div>
+                  </div>
+                }>
+                  <MapSelector
+                    startPoint={startPoint}
+                    endPoint={endPoint}
+                    onStartPointChange={handleStartPointChange}
+                    onEndPointChange={handleEndPointChange}
+                    routeGeometry={routeGeometry}
+                  />
+                </Suspense>
               </div>
             </div>
 

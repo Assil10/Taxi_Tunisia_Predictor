@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, memo, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -28,10 +28,10 @@ function MapClickHandler({ onMapClick, hasStart, hasEnd }) {
   return null;
 }
 
-const MapSelector = ({ startPoint, endPoint, onStartPointChange, onEndPointChange, routeGeometry }) => {
+const MapSelector = memo(({ startPoint, endPoint, onStartPointChange, onEndPointChange, routeGeometry }) => {
   const mapRef = useRef(null);
 
-  const handleMapClick = (latlng, hasStart, hasEnd) => {
+  const handleMapClick = useCallback((latlng, hasStart, hasEnd) => {
     // If no start point, set start point
     if (!hasStart) {
       onStartPointChange({ lat: latlng.lat, lng: latlng.lng });
@@ -45,7 +45,7 @@ const MapSelector = ({ startPoint, endPoint, onStartPointChange, onEndPointChang
       onStartPointChange({ lat: latlng.lat, lng: latlng.lng });
       onEndPointChange(null);
     }
-  };
+  }, [onStartPointChange, onEndPointChange]);
 
   // Use route geometry if available (actual streets), otherwise use straight line
   const polylinePositions = routeGeometry 
@@ -150,7 +150,9 @@ const MapSelector = ({ startPoint, endPoint, onStartPointChange, onEndPointChang
       )}
     </div>
   );
-};
+});
+
+MapSelector.displayName = 'MapSelector';
 
 export default MapSelector;
 
