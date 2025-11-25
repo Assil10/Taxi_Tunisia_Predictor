@@ -55,7 +55,7 @@ const MapSelector = ({ startPoint, endPoint, onStartPointChange, onEndPointChang
       : []);
 
   return (
-    <div className="w-full h-full rounded-lg overflow-hidden shadow-lg border-2 border-gray-300">
+    <div className="w-full h-full rounded-xl overflow-hidden relative border border-slate-700/50 shadow-2xl">
       <MapContainer
         center={DEFAULT_CENTER}
         zoom={DEFAULT_ZOOM}
@@ -79,8 +79,11 @@ const MapSelector = ({ startPoint, endPoint, onStartPointChange, onEndPointChang
           <Marker position={[startPoint.lat, startPoint.lng]}>
             <Popup>
               <div className="text-center">
-                <p className="font-bold text-green-600">📍 Start Point</p>
-                <p className="text-xs">
+                <p className="font-bold text-green-400 flex items-center justify-center gap-2">
+                  <span>📍</span>
+                  Start Point
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
                   {startPoint.lat.toFixed(4)}, {startPoint.lng.toFixed(4)}
                 </p>
               </div>
@@ -93,8 +96,11 @@ const MapSelector = ({ startPoint, endPoint, onStartPointChange, onEndPointChang
           <Marker position={[endPoint.lat, endPoint.lng]}>
             <Popup>
               <div className="text-center">
-                <p className="font-bold text-red-600">🎯 End Point</p>
-                <p className="text-xs">
+                <p className="font-bold text-red-400 flex items-center justify-center gap-2">
+                  <span>🎯</span>
+                  End Point
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
                   {endPoint.lat.toFixed(4)}, {endPoint.lng.toFixed(4)}
                 </p>
               </div>
@@ -106,19 +112,42 @@ const MapSelector = ({ startPoint, endPoint, onStartPointChange, onEndPointChang
         {polylinePositions.length > 0 && (
           <Polyline
             positions={polylinePositions}
-            color={routeGeometry ? "#3b82f6" : "#60a5fa"} // Different color for actual route vs straight line
-            weight={routeGeometry ? 5 : 4}
-            opacity={routeGeometry ? 0.8 : 0.7}
-            dashArray={routeGeometry ? undefined : "10, 10"} // Solid line for actual route, dashed for straight line
+            color={routeGeometry ? "#3b82f6" : "#60a5fa"}
+            weight={routeGeometry ? 6 : 4}
+            opacity={routeGeometry ? 0.9 : 0.6}
+            dashArray={routeGeometry ? undefined : "15, 10"}
           />
         )}
       </MapContainer>
       
-      <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-md z-[1000]">
-        <p className="text-sm text-gray-700">
-          <span className="font-semibold">💡 Tip:</span> Click on the map to set {!startPoint ? 'start' : !endPoint ? 'end' : 'new'} point
+      {/* Help tip overlay */}
+      <div className="absolute bottom-4 left-4 glass-card-strong px-4 py-3 rounded-xl shadow-xl z-[1000] border border-slate-700/50 animate-fadeIn">
+        <p className="text-sm text-slate-200 flex items-center gap-2">
+          <span className="text-lg">💡</span>
+          <span>
+            <span className="font-semibold">Click</span> to set {!startPoint ? 'start' : !endPoint ? 'end' : 'new'} point
+          </span>
         </p>
       </div>
+
+      {/* Status indicators */}
+      {startPoint && (
+        <div className="absolute top-4 right-4 glass-card-strong px-4 py-2 rounded-xl shadow-xl z-[1000] border border-green-500/30 animate-fadeIn">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="w-2 h-2 bg-green-400 rounded-full pulse-dot"></span>
+            <span className="text-slate-200 font-medium">Start selected</span>
+          </div>
+        </div>
+      )}
+      
+      {endPoint && (
+        <div className="absolute top-4 right-4 glass-card-strong px-4 py-2 rounded-xl shadow-xl z-[1000] border border-red-500/30 animate-fadeIn">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="w-2 h-2 bg-red-400 rounded-full pulse-dot"></span>
+            <span className="text-slate-200 font-medium">Route ready</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

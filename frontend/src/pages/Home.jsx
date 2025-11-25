@@ -89,24 +89,41 @@ const Home = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 sm:py-12">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            🚕 AI Taxi Price Predictor
-          </h1>
-          <p className="text-gray-600">
-            Select your route on the map and get an instant fare prediction
+        <div className="text-center mb-12 animate-fadeInUp">
+          <div className="inline-block mb-4">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl blur-xl opacity-50" />
+              <h1 className="relative text-5xl sm:text-6xl font-extrabold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
+                🚕 AI Taxi Price Predictor
+              </h1>
+            </div>
+          </div>
+          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+            Select your route on the map and get an instant, AI-powered fare prediction
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Left Column: Map and Controls */}
           <div className="lg:col-span-2 space-y-6">
             {/* Map */}
-            <div className="bg-white rounded-xl shadow-lg p-4">
-              <div className="h-96 relative">
+            <div className="glass-card-strong rounded-2xl p-4 sm:p-6 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-slate-200 flex items-center gap-2">
+                  <span className="text-2xl">🗺️</span>
+                  Interactive Map
+                </h3>
+                {startPoint && endPoint && (
+                  <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                    Route Selected
+                  </div>
+                )}
+              </div>
+              <div className="h-96 sm:h-[500px] relative rounded-xl overflow-hidden">
                 <MapSelector
                   startPoint={startPoint}
                   endPoint={endPoint}
@@ -118,54 +135,63 @@ const Home = () => {
             </div>
 
             {/* Input Controls */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            <div className="glass-card-strong rounded-2xl p-6 sm:p-8 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+              <h2 className="text-2xl font-bold text-slate-100 mb-6 flex items-center gap-2">
+                <span className="text-2xl">⚙️</span>
                 Trip Details
               </h2>
               
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {/* Auto-Detect City Toggle */}
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="flex items-center space-x-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        Auto-detect City
-                      </label>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Automatically detect city from map coordinates
-                      </p>
+                <div className="glass-card rounded-xl p-5 border border-slate-700/50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center">
+                        <span className="text-xl">🌍</span>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-200">
+                          Auto-detect City
+                        </label>
+                        <p className="text-xs text-slate-400 mt-1">
+                          Automatically detect city from map coordinates
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setAutoDetectCity(!autoDetectCity)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
-                      autoDetectCity ? 'bg-primary-600' : 'bg-gray-300'
-                    }`}
-                    role="switch"
-                    aria-checked={autoDetectCity}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        autoDetectCity ? 'translate-x-6' : 'translate-x-1'
+                    <button
+                      type="button"
+                      onClick={() => setAutoDetectCity(!autoDetectCity)}
+                      className={`relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 ${
+                        autoDetectCity 
+                          ? 'bg-gradient-to-r from-blue-500 to-purple-500' 
+                          : 'bg-slate-700'
                       }`}
-                    />
-                  </button>
+                      role="switch"
+                      aria-checked={autoDetectCity}
+                    >
+                      <span
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition-transform duration-300 ${
+                          autoDetectCity ? 'translate-x-8' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
 
                 {/* City Selection - Only show when auto-detect is OFF */}
                 {!autoDetectCity && (
                   <div className="animate-fadeIn">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      City
+                    <label className="block text-sm font-semibold text-slate-200 mb-3 flex items-center gap-2">
+                      <span>🏙️</span>
+                      Select City
                     </label>
                     <select
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-3 glass-card rounded-xl text-slate-200 border border-slate-700/50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-slate-900/50"
                     >
                       {CITIES.map((c) => (
-                        <option key={c} value={c}>
+                        <option key={c} value={c} className="bg-slate-900">
                           {c}
                         </option>
                       ))}
@@ -175,18 +201,19 @@ const Home = () => {
 
                 {/* Time of Day Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-slate-200 mb-3 flex items-center gap-2">
+                    <span>🕐</span>
                     Time of Day
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-3 gap-3">
                     {TIME_OPTIONS.map((option) => (
                       <button
                         key={option.value}
                         onClick={() => setTimeOfDay(option.value)}
-                        className={`px-4 py-3 rounded-lg font-medium transition-all ${
+                        className={`px-4 py-4 rounded-xl font-semibold transition-all duration-300 transform ${
                           timeOfDay === option.value
-                            ? 'bg-primary-500 text-white shadow-md'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg scale-105 glow-blue'
+                            : 'glass-card text-slate-300 hover:bg-slate-800/50 hover:scale-[1.02] border border-slate-700/50'
                         }`}
                       >
                         {option.label}
@@ -200,13 +227,22 @@ const Home = () => {
                   <button
                     onClick={handlePredict}
                     disabled={isLoading || !startPoint || !endPoint}
-                    className="flex-1 bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-md"
+                    className="flex-1 btn-gradient text-white px-6 py-4 rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-none"
                   >
-                    {isLoading ? '⏳ Predicting...' : '🔮 Predict Fare'}
+                    {isLoading ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <span className="animate-spin">⏳</span>
+                        Predicting...
+                      </span>
+                    ) : (
+                      <span className="flex items-center justify-center gap-2">
+                        🔮 Predict Fare
+                      </span>
+                    )}
                   </button>
                   <button
                     onClick={handleReset}
-                    className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                    className="px-6 py-4 glass-card text-slate-300 rounded-xl font-semibold hover:bg-slate-800/50 transition-all border border-slate-700/50"
                   >
                     🔄 Reset
                   </button>
@@ -214,8 +250,11 @@ const Home = () => {
 
                 {/* Error Message */}
                 {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                    <p className="font-medium">⚠️ {error}</p>
+                  <div className="glass-card border border-red-500/50 bg-red-500/10 text-red-400 px-5 py-4 rounded-xl animate-fadeIn">
+                    <p className="font-semibold flex items-center gap-2">
+                      <span>⚠️</span>
+                      {error}
+                    </p>
                   </div>
                 )}
               </div>
